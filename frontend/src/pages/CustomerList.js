@@ -68,21 +68,33 @@ function CustomerList() {
   const handleEditClick = (customer) => {
     setSelectedCustomer(customer);
     setFormData({
-      first_name: customer.first_name,
-      last_name: customer.last_name,
-      email: customer.email,
-      phone: customer.phone,
-      address: customer.address
+      first_name: customer.first_name || '',
+      last_name: customer.last_name || '',
+      email: customer.email || '',
+      phone: customer.phone || '',
+      address: customer.address || customer.street || ''
     });
     setEditDialogOpen(true);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    if (name === 'phone') {
+      // Only allow digits, hyphens, parentheses, spaces for phone
+      const phoneRegex = /^[0-9()\-\s+]*$/;
+      if (phoneRegex.test(value) || value === '') {
+        setFormData({
+          ...formData,
+          [name]: value
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
 
   const handleAddSubmit = async () => {
@@ -154,7 +166,7 @@ function CustomerList() {
                 <TableCell>{customer.first_name} {customer.last_name}</TableCell>
                 <TableCell>{customer.email}</TableCell>
                 <TableCell>{customer.phone}</TableCell>
-                <TableCell>{customer.address}</TableCell>
+                <TableCell>{customer.address || 'N/A'}</TableCell>
                 <TableCell>
                   <Button 
                     variant="outlined" 
@@ -233,7 +245,6 @@ function CustomerList() {
                 value={formData.address}
                 onChange={handleInputChange}
                 fullWidth
-                required
               />
             </Grid>
           </Grid>
@@ -297,7 +308,6 @@ function CustomerList() {
                 value={formData.address}
                 onChange={handleInputChange}
                 fullWidth
-                required
               />
             </Grid>
           </Grid>

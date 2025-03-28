@@ -1,118 +1,66 @@
--- Example SQL queries for Hotel Management System
+-- dbSQL.sql - Queries based on relational algebra (Step 7)
+-- This script contains SQL queries using joins, aggregation, and subqueries.
 
--- 1. Find all available rooms in a specific hotel
-SELECT r.id, r.room_number, r.type, r.price, r.capacity
-FROM Room r
-WHERE r.hotel_id = 1 AND r.status = 'Available'
-ORDER BY r.price;
+-- Query 1: Retrieve all bookings that were later canceled
+-- This query joins the BOOKING and CANCELLATION tables to find all canceled bookings.
+SELECT B.BookID, B.GusID, B.Check_in, B.Check_out
+FROM BOOKING B
+JOIN CANCELLATION C ON B.BookID = C.BookID;
 
--- 2. Find all reservations for a specific customer
-SELECT r.id, h.name as hotel_name, rm.room_number, r.check_in_date, r.check_out_date, r.status
-FROM Reservation r
-JOIN Room rm ON r.room_id = rm.id
-JOIN Hotel h ON rm.hotel_id = h.id
-WHERE r.customer_id = 2
-ORDER BY r.check_in_date;
+-- Query 2: Find the total amount paid by each guest
+-- This query groups by GusID and sums the payment amounts, ordering by total paid in descending order.
+SELECT GusID, SUM(Pd_amt) AS TotalPaid
+FROM PAYMENT
+GROUP BY GusID
+HAVING SUM(Pd_amt) > 500
+ORDER BY TotalPaid DESC;
 
--- 3. Get occupancy rate for each hotel
-SELECT 
-    h.id,
-    h.name,
-    COUNT(r.id) as total_rooms,
-    SUM(CASE WHEN r.status = 'Occupied' THEN 1 ELSE 0 END) as occupied_rooms,
-    (SUM(CASE WHEN r.status = 'Occupied' THEN 1 ELSE 0 END) / COUNT(r.id)) * 100 as occupancy_rate
-FROM Hotel h
-JOIN Room r ON h.id = r.hotel_id
-GROUP BY h.id, h.name
-ORDER BY occupancy_rate DESC;
+-- Query 3: Get the total revenue generated from all bookings
+-- This query sums the total price from the INVOICE table.
+SELECT SUM(total_price) AS TotalRevenue
+FROM INVOICE;
 
--- 4. Find all reservations for a specific date range
-SELECT 
-    r.id,
-    c.first_name,
-    c.last_name,
-    h.name as hotel_name,
-    rm.room_number,
-    r.check_in_date,
-    r.check_out_date,
-    r.status
-FROM Reservation r
-JOIN Customer c ON r.customer_id = c.id
-JOIN Room rm ON r.room_id = rm.id
-JOIN Hotel h ON rm.hotel_id = h.id
-WHERE 
-    (r.check_in_date BETWEEN '2023-11-01' AND '2023-11-15') OR
-    (r.check_out_date BETWEEN '2023-11-01' AND '2023-11-15') OR
-    (r.check_in_date <= '2023-11-01' AND r.check_out_date >= '2023-11-15')
-ORDER BY r.check_in_date;
 
--- 5. Calculate revenue by hotel
-SELECT 
-    h.id,
-    h.name,
-    SUM(i.amount) as total_revenue
-FROM Hotel h
-JOIN Room rm ON h.id = rm.hotel_id
-JOIN Reservation r ON rm.id = r.room_id
-JOIN Invoice i ON r.id = i.reservation_id
-WHERE i.status = 'Paid'
-GROUP BY h.id, h.name
-ORDER BY total_revenue DESC;
+-- Query 4: Find all guests who have booked a Deluxe room
+-- This query joins ROOM and BOOKING and filters results where Deluxe_flag is set to 1.
+SELECT DISTINCT B.GusID
+FROM BOOKING B
+JOIN ROOM R ON B.Room_no = R.Room_no
+WHERE R.Deluxe_flag = 'Y';
 
--- 6. Find customers who have made multiple reservations
-SELECT 
-    c.id,
-    c.first_name,
-    c.last_name,
-    c.email,
-    COUNT(r.id) as reservation_count
-FROM Customer c
-JOIN Reservation r ON c.id = r.customer_id
-GROUP BY c.id, c.first_name, c.last_name, c.email
-HAVING COUNT(r.id) > 1
-ORDER BY reservation_count DESC;
 
--- 7. Find rooms that need maintenance
-SELECT 
-    h.name as hotel_name,
-    r.room_number,
-    r.type,
-    r.status
-FROM Room r
-JOIN Hotel h ON r.hotel_id = h.id
-WHERE r.status = 'Maintenance'
-ORDER BY h.name, r.room_number;
+-- Query 5: Find guests who have paid more than the average payment amount
+-- This query uses a subquery to compare guest payments against the average payment amount.
+SELECT GusID, SUM(Pd_amt) AS TotalPaid
+FROM PAYMENT
+GROUP BY GusID
+HAVING SUM(Pd_amt) > (SELECT AVG(Pd_amt) FROM PAYMENT);
 
--- 8. Calculate average length of stay
-SELECT 
-    AVG(DATEDIFF(r.check_out_date, r.check_in_date)) as avg_stay_length
-FROM Reservation r
-WHERE r.status IN ('Confirmed', 'Checked In', 'Checked Out');
 
--- 9. Find unpaid invoices
-SELECT 
-    i.id as invoice_id,
-    c.first_name,
-    c.last_name,
-    h.name as hotel_name,
-    rm.room_number,
-    i.amount,
-    i.issue_date,
-    i.due_date
-FROM Invoice i
-JOIN Reservation r ON i.reservation_id = r.id
-JOIN Customer c ON r.customer_id = c.id
-JOIN Room rm ON r.room_id = rm.id
-JOIN Hotel h ON rm.hotel_id = h.id
-WHERE i.status = 'Unpaid' AND i.due_date < CURDATE()
-ORDER BY i.due_date;
+-- Query 6: Are there any available rooms for the weekend?
+-- Select rooms that do not have overlapping bookings for the weekend.
+SELECT ROOM_NO
+FROM ROOM
+WHERE ROOM_NO NOT IN (
+    SELECT ROOM_NO FROM BOOKING
+    WHERE Check_In > '2025-02-14' AND Check_Out < '2025-02-17'
+);
 
--- 10. Get room type distribution by hotel
-SELECT 
-    h.name as hotel_name,
-    r.type as room_type,
-    COUNT(*) as room_count
-FROM Hotel h
-JOIN Room r ON h.id = r.hotel_id
-GROUP BY h.name, r.type
-ORDER BY h.name, room_count DESC;
+
+
+-- Query 7: Is it possible to switch to a standard room?
+-- Lists available suites not booked.
+SELECT Room_No 
+FROM ROOM
+WHERE Descriptions = 'Standard' AND Room_No NOT IN (
+    SELECT Room_No FROM BOOKING
+);
+
+
+-- Query 8: Show the profit and occupancy rate in the past month.
+-- Aggregates total revenue and occupancy.
+SELECT SUM(Total_Price) AS TotalRevenue, 
+       COUNT(DISTINCT Room_No) / COUNT(*) AS OccupancyRate
+FROM BOOKING
+WHERE Check_In >= '2025-02-01' AND Check_Out <= '2025-02-28';
+

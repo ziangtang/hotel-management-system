@@ -29,9 +29,38 @@ function ReservationList() {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        // Replace mock data with actual API call
+        // Fetch all reservations
         const response = await axios.get('http://localhost:5000/api/reservations');
-        setReservations(response.data);
+        
+        // Create a map to store customer data for faster lookup
+        const customerMap = {};
+        const customersResponse = await axios.get('http://localhost:5000/api/customers');
+        customersResponse.data.forEach(customer => {
+          customerMap[customer.id] = customer;
+        });
+        
+        // Create a map to store room data for faster lookup
+        const roomMap = {};
+        const roomsResponse = await axios.get('http://localhost:5000/api/rooms');
+        roomsResponse.data.forEach(room => {
+          roomMap[room.id] = room;
+        });
+        
+        // Enhance reservation data with customer and room information
+        const enhancedReservations = response.data.map(reservation => {
+          const customer = customerMap[reservation.customer_id];
+          const room = roomMap[reservation.room_id];
+          
+          return {
+            ...reservation,
+            customer_name: customer ? 
+              `${customer.first_name || ''} ${customer.last_name || ''}`.trim() : 'Unknown',
+            room_number: room ? (room.room_no || room.id) : reservation.room_id,
+            payment: reservation.total_price ? `$${reservation.total_price}` : 'N/A'
+          };
+        });
+        
+        setReservations(enhancedReservations);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch reservations');
@@ -71,6 +100,7 @@ function ReservationList() {
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
+  // Update the table header and row rendering
   return (
     <div>
       <Typography variant="h4" className="page-title">
@@ -93,7 +123,7 @@ function ReservationList() {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Customer</TableCell>
-              <TableCell>Hotel</TableCell>
+              <TableCell>Payment</TableCell>
               <TableCell>Room</TableCell>
               <TableCell>Check In</TableCell>
               <TableCell>Check Out</TableCell>
@@ -106,15 +136,15 @@ function ReservationList() {
               <TableRow key={reservation.id}>
                 <TableCell>{reservation.id}</TableCell>
                 <TableCell>{reservation.customer_name}</TableCell>
-                <TableCell>{reservation.hotel_name}</TableCell>
+                <TableCell>{reservation.payment}</TableCell>
                 <TableCell>{reservation.room_number}</TableCell>
                 <TableCell>{reservation.check_in_date}</TableCell>
                 <TableCell>{reservation.check_out_date}</TableCell>
                 <TableCell>
                   <Chip 
-                    label={reservation.status} 
+                    label={reservation.status || 'Confirmed'} 
                     color={
-                      reservation.status === 'Confirmed' ? 'primary' : 
+                      (reservation.status === 'Confirmed' || !reservation.status) ? 'primary' : 
                       reservation.status === 'Checked In' ? 'success' : 
                       reservation.status === 'Checked Out' ? 'default' : 
                       'error'
@@ -155,7 +185,7 @@ function ReservationList() {
         <DialogTitle>Cancel Reservation</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to cancel the reservation for {reservationToDelete?.customer_name} at {reservationToDelete?.hotel_name}?
+            Are you sure you want to cancel the reservation for {reservationToDelete?.customer_name} (Room {reservationToDelete?.room_number})?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

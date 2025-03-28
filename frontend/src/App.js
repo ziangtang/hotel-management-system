@@ -1,82 +1,49 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
-import HotelList from './pages/HotelList';
+import RoomTypes from './pages/RoomTypes'; // Add this import
 import RoomList from './pages/RoomList';
+import RoomDetail from './pages/RoomDetail';
 import ReservationList from './pages/ReservationList';
-import CustomerList from './pages/CustomerList';
-import NewReservation from './pages/NewReservation';
 import ReservationDetail from './pages/ReservationDetail';
-import EditReservation from './pages/EditReservation';
-// Add this import for NewCustomer
-import NewCustomer from './components/NewCustomer';
+import ReservationForm from './pages/ReservationForm';
+import CustomerList from './pages/CustomerList';
+import CustomerDetail from './pages/CustomerDetail';
+import CustomerForm from './pages/CustomerForm';
+import ReviewForm from './pages/ReviewForm';
+import SQLQueryInterface from './pages/SQLQueryInterface';
+import DatabaseFeatures from './pages/DatabaseFeatures';
+import ErrorHandlingDemo from './pages/ErrorHandlingDemo';
 import './App.css';
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#2c3e50', // Dark blue/slate color
-    },
-    secondary: {
-      main: '#e74c3c', // Red accent color
-    },
-    background: {
-      default: '#f5f5f5',
-    },
-  },
-  typography: {
-    h4: {
-      fontWeight: 500,
-    },
-    button: {
-      textTransform: 'none', // Prevents all-caps buttons
-    },
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 4,
-        },
-      },
-    },
-  },
-});
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <div className="App">
-          <Navbar />
-          <div className="content">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/hotels" element={<HotelList />} />
-              <Route path="/hotels/:hotelId/rooms" element={<RoomList />} />
-              <Route path="/reservations" element={<ReservationList />} />
-              <Route path="/reservations/new" element={<NewReservation />} />
-              {/* Move the edit route before the detail route */}
-              <Route path="/reservations/edit/:reservationId" element={<EditReservation />} />
-              <Route path="/reservations/:reservationId" element={<ReservationDetail />} />
-              <Route path="/customers" element={<CustomerList />} />
-              <Route path="/customers/new" element={<NewCustomer />} />
-            </Routes>
-          </div>
+    <Router>
+      <div className="App">
+        <Navbar />
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/roomtypes" element={<RoomTypes />} />
+            <Route path="/rooms" element={<RoomList />} />
+            <Route path="/rooms/:roomId" element={<RoomDetail />} />
+            <Route path="/reservations" element={<ReservationList />} />
+            <Route path="/reservations/new" element={<ReservationForm />} />
+            <Route path="/reservations/:reservationId" element={<ReservationDetail />} />
+            <Route path="/reservations/:reservationId/edit" element={<ReservationForm />} />
+            <Route path="/customers" element={<CustomerList />} />
+            <Route path="/customers/new" element={<CustomerForm />} />
+            <Route path="/customers/:customerId" element={<CustomerDetail />} />
+            <Route path="/customers/:customerId/edit" element={<CustomerForm />} />
+            <Route path="/reviews/new" element={<ReviewForm />} />
+            <Route path="/sql-interface" element={<SQLQueryInterface />} />
+            <Route path="/database-features" element={<DatabaseFeatures />} />
+            <Route path="/error-handling" element={<ErrorHandlingDemo />} />
+          </Routes>
         </div>
-      </Router>
-    </ThemeProvider>
+      </div>
+    </Router>
   );
 }
 
