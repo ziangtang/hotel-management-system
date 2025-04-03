@@ -1,7 +1,33 @@
-<<<<<<<<< Temporary merge branch 1
-![image](https://github.com/user-attachments/assets/d4a41e17-6d00-489f-b88e-62890f9e29de)
-![image](https://github.com/user-attachments/assets/b1d405b3-3716-4842-b3f1-c56cc12aa8d7)
-=========
+# GCP Config
+![image](https://github.com/user-attachments/assets/68967cda-a9e7-4f0f-8eff-e93de6f1eb7a)
+![image](https://github.com/user-attachments/assets/f22240ec-3780-495e-bd08-40a6de9a2c6e)
+
+
+
+# Dashboard
+![image](https://github.com/user-attachments/assets/5fb69dac-8cef-4739-aa1c-16afa252023a)
+
+# Room types
+![image](https://github.com/user-attachments/assets/23ebb22e-107e-4051-b8b5-a82d5dc79f77)
+
+# Rooms
+![image](https://github.com/user-attachments/assets/64db4eb8-56f8-4352-8760-24816f562002)
+
+# Reservation
+![image](https://github.com/user-attachments/assets/1b2c8882-6e5f-4d31-9180-e733968beff1)
+
+# Customer
+![image](https://github.com/user-attachments/assets/520af431-ff07-4210-8cb1-961a801247d6)
+
+# SQL query interface
+![image](https://github.com/user-attachments/assets/9c83531c-b467-4d24-aae8-515cc5273a09)
+
+# DB feature
+![image](https://github.com/user-attachments/assets/84f990fe-de4f-4092-9af1-61c7f0b1456a)
+
+# Error handler
+![image](https://github.com/user-attachments/assets/9c451028-7d23-42a2-bafd-3c434b01e227)
+
 # Hotel Management System
 
 ## Database Persistence Fix
