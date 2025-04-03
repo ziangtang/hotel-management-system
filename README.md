@@ -1,3 +1,8 @@
+# GCP Config
+![image](https://github.com/user-attachments/assets/68967cda-a9e7-4f0f-8eff-e93de6f1eb7a)
+![image](https://github.com/user-attachments/assets/f22240ec-3780-495e-bd08-40a6de9a2c6e)
+
+
 # Dashboard
 ![image](https://github.com/user-attachments/assets/5fb69dac-8cef-4739-aa1c-16afa252023a)
 
